@@ -42,6 +42,7 @@ namespace ElevenNote.Services
                 {
                     NoteId = e.NoteId,
                     Title = e.Title,
+                    Content = e.Content,
                     CreateUtc = e.CreateUtc
                 });
 
@@ -63,6 +64,30 @@ namespace ElevenNote.Services
                     CreateUtc = entity.CreateUtc,
                     ModifiedUtc = entity.ModifiedUts
                 };
+            }
+        }
+
+        public bool UpdateNote(NoteEdit model)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity = ctx.Notes.Single(e => e.NoteId == model.NoteId && e.OwnerId == _userId);
+
+                entity.Title = model.Title;
+                entity.Content = model.Content;
+                entity.ModifiedUts = DateTimeOffset.Now;
+
+                return ctx.SaveChanges() == 1;
+            }
+        }
+
+        public bool DeleteNote (int noteId)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity = ctx.Notes.Single(e => e.NoteId == noteId && e.OwnerId == _userId);
+                ctx.Notes.Remove(entity);
+                return ctx.SaveChanges() == 1;
             }
         }
     }
